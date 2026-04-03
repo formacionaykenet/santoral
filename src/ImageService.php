@@ -505,4 +505,65 @@ class ImageService
         $text = preg_replace('/[^a-z0-9]+/', '_', $text);
         return trim($text, '_');
     }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Gestión de directorio público (para Instagram y TikTok en hosting compartido)
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Copia las imágenes al directorio público web para que Meta y TikTok
+     * puedan descargarlas vía HTTPS.
+     *
+     * En Hostinger, PUBLIC_MEDIA_PATH apunta a public_html/media/
+     * y PUBLIC_BASE_URL a https://tudominio.com/media
+     *
+     * @param  array $imagePaths Rutas locales de las imágenes a publicar
+     * @return array URLs públicas correspondientes (mismo orden)
+     */
+    public function publishToPublicDir(array $imagePaths): array
+    {
+        $publicDir = PUBLIC_MEDIA_PATH;
+
+        if (!is_dir($publicDir)) {
+            mkdir($publicDir, 0755, true);
+        }
+
+        $urls = [];
+        foreach ($imagePaths as $path) {
+            $filename = basename($path);
+            $dest     = $publicDir . '/' . $filename;
+
+            if (!copy($path, $dest)) {
+                throw new \RuntimeException("No se pudo copiar imagen al directorio público: {$dest}");
+            }
+
+            $urls[] = rtrim(PUBLIC_BASE_URL, '/') . '/' . $filename;
+        }
+
+        $this->logger->debug('Imágenes copiadas a directorio público', ['count' => count($urls)]);
+        return $urls;
+    }
+
+    /**
+     * Elimina todas las imágenes del directorio público tras publicarlas
+     * en redes. Mantiene limpio el directorio web.
+     */
+    public function cleanPublicDir(): void
+    {
+        $publicDir = PUBLIC_MEDIA_PATH;
+
+        if (!is_dir($publicDir)) {
+            return;
+        }
+
+        $removed = 0;
+        foreach (glob("{$publicDir}/*.{jpg,jpeg,png}", GLOB_BRACE) ?: [] as $file) {
+            if (is_file($file)) {
+                unlink($file);
+                $removed++;
+            }
+        }
+
+        $this->logger->debug("Directorio público limpiado: {$removed} archivos eliminados");
+    }
 }

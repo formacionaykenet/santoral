@@ -1,0 +1,24 @@
+# ── Seguridad básica para el proyecto Santoral Bot ────────────────────────────
+# Si el proyecto está dentro de public_html, este .htaccess protege
+# los archivos sensibles. Si está fuera de public_html, no es necesario.
+
+# Negar acceso a todos los archivos por defecto
+Options -Indexes
+
+# Proteger archivos de configuración y entorno
+<FilesMatch "^(\.env|\.env\..*|composer\.json|composer\.lock|.*\.log)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Proteger directorios críticos
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Bloquear acceso directo a src/, config/, data/, storage/, vendor/
+    RewriteRule ^(src|config|data|vendor|storage)/ - [F,L]
+
+    # Bloquear acceso a archivos PHP salvo run.php (que se ejecuta por cron, no por web)
+    RewriteCond %{REQUEST_FILENAME} \.php$
+    RewriteRule .* - [F,L]
+</IfModule>
