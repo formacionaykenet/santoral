@@ -1,0 +1,25 @@
+# Dependencias
+/vendor/
+
+# Entorno
+.env
+
+# Storage generado
+/storage/images/
+/storage/audio/
+/storage/videos/
+/storage/logs/
+
+# Assets binarios (se instalan manualmente)
+/assets/fonts/*.ttf
+/assets/music/*.mp3
+/assets/frames/*.png
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# PHP
+*.cache
