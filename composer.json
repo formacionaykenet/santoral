@@ -1,0 +1,21 @@
+{
+    "name": "santoral/bot",
+    "description": "Bot automatizado del santoral católico para Instagram y TikTok",
+    "type": "project",
+    "license": "private",
+    "require": {
+        "php": ">=8.1",
+        "vlucas/phpdotenv": "^5.6",
+        "guzzlehttp/guzzle": "^7.9",
+        "monolog/monolog": "^3.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Santoral\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}
